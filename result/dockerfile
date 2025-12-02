@@ -1,0 +1,18 @@
+# result/Dockerfile
+FROM node:18.20.1-alpine
+
+WORKDIR /app
+
+# copy package files first (cache npm install)
+COPY package*.json ./
+
+# install dependencies (production)
+RUN npm install --production
+
+# copy app sources
+COPY . .
+
+EXPOSE 80
+
+# NOTE: adapt start script if package.json uses a different start command
+CMD ["node", "server.js"]
