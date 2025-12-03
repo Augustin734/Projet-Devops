@@ -1,20 +1,12 @@
-# poll/Dockerfile
-# Use a fixed, reasonably recent Python base (not "latest")
 FROM python:3.11.6-slim-bullseye
 
 WORKDIR /app
 
-# Copy requirements and install
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
-# Copy application code
 COPY . .
 
-# Expose the port the app must run on
 EXPOSE 80
 
-# Run the app on port 80.
-# NOTE: Adapt the command below if your Flask app entry point filename is different (e.g. app.py, poll.py, wsgi.py).
-# The Flask app should listen on 0.0.0.0:80 (not 127.0.0.1).
 CMD ["python", "app.py"]

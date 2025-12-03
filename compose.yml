@@ -1,56 +1,40 @@
-services:
+services:                        
 
-  poll:
-    build: ./poll
+  poll:                           
+    build: ./poll                  
     ports:
-      - "5000:80"
+      - "5000:80"                  
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - REDIS_HOST=redis           
+      - REDIS_PORT=6379            
     networks:
-      - poll-tier
-      - back-tier
-    restart: unless-stopped
-    depends_on:
-      redis:
-        condition: service_healthy
+      - poll-tier                 
+      - back-tier                 
 
-  redis:
-    image: redis:7.0-alpine
+  redis:                           
+    image: redis:7.0-alpine        
     ports:
-      - "6379:6379"
+      - "6379:6379"                
     networks:
-      - back-tier
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - back-tier                  
 
-  worker:
-    build: ./worker
+  worker:                          
+    build: ./worker                
     environment:
-      - REDIS_HOST=redis
+      - REDIS_HOST=redis           
       - REDIS_PORT=6379
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=db           
       - POSTGRES_PORT=5432
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - back-tier
-    restart: unless-stopped
-    depends_on:
-      redis:
-        condition: service_healthy
-      db:
-        condition: service_healthy
 
-  db:
-    image: postgres:15.4-alpine
+  db:                              
+    image: postgres:15.4-alpine    
     environment:
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_DB=${POSTGRES_DB}       
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
@@ -58,34 +42,25 @@ services:
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
     networks:
       - back-tier
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
-  result:
-    build: ./result
+  result:                          
+    build: ./result               
     ports:
-      - "5001:80"
+      - "5001:80"                  
     environment:
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=db           
       - POSTGRES_PORT=5432
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - back-tier
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
+      - result-tier
 
 volumes:
-  db-data:
+  db-data:                         
 
 networks:
-  poll-tier:
+  poll-tier:                       
   result-tier:
   back-tier:
