@@ -9,14 +9,16 @@ services:
       - REDIS_PORT=6379            
     networks:
       - poll-tier                 
-      - back-tier                 
+      - back-tier
+    restart: always               
 
   redis:                           
     image: redis:7.0-alpine        
     ports:
       - "6379:6379"                
     networks:
-      - back-tier                  
+      - back-tier
+    restart: always                  
 
   worker:                          
     build: ./worker                
@@ -30,6 +32,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - back-tier
+    restart: always
 
   db:                              
     image: postgres:15.4-alpine    
@@ -42,6 +45,7 @@ services:
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
     networks:
       - back-tier
+    restart: always
 
   result:                          
     build: ./result               
@@ -56,6 +60,7 @@ services:
     networks:
       - back-tier
       - result-tier
+    restart: always
 
 volumes:
   db-data:                         
